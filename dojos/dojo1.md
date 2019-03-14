@@ -110,19 +110,19 @@ A lot useful training comes from Capture the Flag exercises. Sites like [VulnHub
 
 First I needed to unzip the download:
 
-![unzip exe](/images/dojo1/unzip-vdi.png)
+![unzip exe](images/dojo1/unzip-vdi.png)
 
 The VDI file needs a VBOX file to manage the 'hardware' for the VM. This XML formatted config points to a VHD storage file. Luckly VBox automates all of this for us in the GUI.
 
 Once that has completed start creating the VM by selecting __New__ from the top left of the GUI. Give the VM a name and allocate the appropriate type an OS version. I'm calling mine osboxes-14-04 and specifying a 32 Bit Ubuntu version. 
 
-![New VM](/images/dojo1/build.png)
+![New VM](images/dojo1/build.png)
 
 Next accept the default __Memory Size__ of 1024 MB
 
 Next Allocate the VDI by selecting the __Use existing virtual hard disk file__, selecting __Create__ once you've selected the disk.
 
-![Disk Allocation](/images/dojo1/vdi-pick.png)
+![Disk Allocation](images/dojo1/vdi-pick.png)
 
 At this point we have a VM that you can power up and log into with the details below:
 
