@@ -192,11 +192,11 @@ This ability comes from a tool called XP Mode. XP Mode is a binary file that con
 
 Using 7-zip extract all the files from the __WindowsXPMode_en-us.exe__ executable binary. 
 
-![unzip exe](/images/dojo1/unzip-exe.png)
+![unzip exe](images/dojo1/unzip-exe.png)
 
 Drill into the extracted sources folder and extract the xpm file. 
 
-![unzip xpm](/images/dojo1/unzip-xpm.png)
+![unzip xpm](images/dojo1/unzip-xpm.png)
 
 Rename VirtualXPVHD to VirtualXPVHD.vhd and ensure that the Attributes are not set to read only. Additionally rename KEY to KEY.txt. Be sure to copy these files to where ever you want to keep your Lab VM details.
 
@@ -210,7 +210,7 @@ At this point we can create shared folders, enable RDP, network settings and cus
 
 Once we're happy with the basic setup its time to power on the VM and go through the installation process. 
 
-[unzip xpm](/images/dojo1/power-on.png)
+[unzip xpm](images/dojo1/power-on.png)
 
 Be sure to configure Region, Language and Keyboard. Pick a good machine name and Admin creds admin:lab
 
@@ -252,14 +252,14 @@ regedit
 
 next got to HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WPAEvents and change the folder permissions to Deny Full Control for the SYSTEM user.
 
-![activated](/images/dojo1/regedit.png)
+![activated](images/dojo1/regedit.png)
 
 return to the cmd prompt and run `msoobe /a`
 if it isn't in your PATH the command is in System32 directory.
 
 if everything has worked you will see a pop up like this: 
 
-![activated](/images/dojo1/active.png)
+![activated](images/dojo1/active.png)
 
 reset the Full control and read permissions on HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WPAEvents and run msoobe /a again and it will still be active.
 
