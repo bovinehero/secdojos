@@ -226,44 +226,9 @@ I can't get to the internet: Check that you can ping google.com. the version of 
 
 Can't activate Windows: This is because TLS 1.2 is required for updating and XP just doesn't have that! 
 
-### XP regedit Hack - Informational Only
+The Key.txt file you took contains the product key required to activate Windows XP. You can use this to activate windows, but you will need to call Microsoft support to do so.
 
-> This will breach your XP software agreement!!! (And actually forces a blue screen long term)
-
-Back in the day a lot of people used to get themselves a free copy of XP by hacking out variables on the registry. This practice still happens with 'free' versions of microsoft software. Sometimes you will need a valid copy of XP to configure legacy software correctly.
-
-The XP VM can be temporarily activated via a reg edit hack, however longterm it will brick the VM and you'll need to perform additional reg-hacks in a revovery shell. 
-
-Copy the code below into [activate.reg](files/WinXPActivate.reg) and run it on your XP machine
-
-```
-Windows Registry Editor Version 5.00
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WPAEvents]
-"OOBETimer"=hex:ff,d5,71,d6,8b,6a,8d,6f,d5,33,93,fd
-; Original setting:
-; "OOBETimer"=hex:eb,54,8c,c6,0e,45,17,59,55,5b,f4,30
-```
-
-next go to a cmd prompt and run 
-
-```
-regedit
-```
-
-next got to HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WPAEvents and change the folder permissions to Deny Full Control for the SYSTEM user.
-
-![activated](images/dojo1/regedit.png)
-
-return to the cmd prompt and run `msoobe /a`
-if it isn't in your PATH the command is in System32 directory.
-
-if everything has worked you will see a pop up like this: 
-
-![activated](images/dojo1/active.png)
-
-reset the Full control and read permissions on HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\WPAEvents and run msoobe /a again and it will still be active.
-
-If the window does not appear, don't worry the command may still have worked, reset the registry permissions and run the command again. You should now see an activated copy of Windows. 
+We'll just leave the system in evaluation mode, because anytime we need an new system for exploit development we should really configure a new system from scratch.
 
 ## 5. Stretch Activities (Optional)
 
@@ -271,4 +236,4 @@ If the window does not appear, don't worry the command may still have worked, re
 2. Play with the CDX Boxes
 3. Attempt RDP/SSH from your Host.
 4. Try an install an OS from scratch and fetch software from eploitdB.
-5. Explore Shared Disk
+5. Explore Shared Disk.
