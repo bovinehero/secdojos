@@ -72,10 +72,10 @@ ifconfig
 
 ![connected.png](images/dojo1/connected.png)
 
-10. check you can connect to the internet, yourself and the Kali Appliance (192.168.100.100) configured in the main dojo.
+10. Check you can connect to the internet, yourself and if you completed the [Import the Kali OVA to an Internal Network](kali-ova.md) you should be able to see a powered on Kali Appliance (192.168.100.100) with a ping.
 
 ```
 ping google.com -c 3
-ping 192.168.100.100 -c 3
 ping 192.168.100.101 -c 3
+ping 192.168.100.100 -c 3
 ```
