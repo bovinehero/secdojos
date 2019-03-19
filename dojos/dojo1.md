@@ -1,7 +1,7 @@
 # Read Team Dojo 1: Setting up a local hacking network
 
-In this Lab we are going to look at setting up a personal network for Offensive Security practice.
-These Lab exercises will also form a baisis for pre-requisites for future Dojos.
+In this Dojo we are going to look at setting up a personal network for Offensive Security practice.
+The Katas linked near the bottom of this document will also show you where to access pre-requisites for future Dojos.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ You will need an internet connected laptop with at least 4GB of RAM, 200GB of Di
 Please have these installed prior to attending.
 
 1. Virtual Box - [latest version](https://www.virtualbox.org/wiki/Downloads)
-If using Windows, Install this package as administrator to get all the virtual drivers to install.
+If using Windows, Install this package as administrator to ensure all the virtual drivers get installed.
 
 2. Virtual Box Addons - [latest version](https://download.virtualbox.org/virtualbox/6.0.4/Oracle_VM_VirtualBox_Extension_Pack-6.0.4.vbox-extpack)
 3. 7zip - [latest version](https://www.7-zip.org/download.html)
@@ -37,14 +37,28 @@ These resources are required if you want to try the Additional Katas, but will n
 4. Ubuntu Server [OSI](https://www.ubuntu.com/download/server) 
 
 
-## 1. Setting up a basic Lab.
+## Setting up a Basic Lab.
 
-todo- write intro
-### Configure Host Only Adapter Network
+This Dojo comprises of a basic core (this document) and several optional katas at the end that you can use to expand your network. To begin with we will be setting up an incredibly basic Virtual Network using Virtual Box.
+There are of course alternatives to this software, but Oracle's Virtual Box is free and convenient package that runs on Windows, Linux and Apple Macs.
 
-In order to get a quick start we are going to hack together a quick host only network. This has the advantage of letting us get to the good stuff quickly. It has the disadvantage of locking the VMs networking capability to within our Host System. (For more convient lab settings using internal networking and a NAT connection check out the stretch katas at the end of the main dojo).
+## 1. Configure Host Only Adapter Network
 
-todo- instructions with screenshots
+In order to get a quick start we are going to hack together a quick host only network. This has the advantage of letting us get to the good stuff quickly but carries the disadvantage of removing their internet access. For more convient lab settings using internal networking and a NAT connection check out the stretch katas at the end of the main dojo.
+
+By default, when installed, Virtual Box creates a Host Only Adapter which can be used to allow a Host system to connect to its guest VMs. This adapter is a virtual NIC, and as a vNIC it can also can be used to host multiple IP Addresses. We are going to use this capability to host a 2 VM network.
+
+1. From the VirtualBox GUI, select __Host Network Adapter__ from the __File__ dropdown.
+
+2. If you don't already have a _VirtualBox Host-Only Etherner Adapter_ select __Create__ to make one.
+
+3. Right click on the __Name__ and select __properties__
+
+![v-adapter.png](images/dojo1/v-adapter.png)
+
+4. In the __Adapter__ tab, select __Configure Adapter Automatically__ and _enable the server_ in __DHCP Server__. You can configure the network as you see fit, but the defaults are suitable for our purposes.
+
+At this satge we have completed all the Virtual Box configuration that we need to do to complete the Lab.
 
 ## 2. First VM: Import the Kali OVA
 
@@ -119,7 +133,10 @@ or
 
 All going well you should have your very first network.
 
-## 4. Scan and attack the CDX System.
+## 4. Attack the CDX System.
+
+The purpose of a pentest is to try and see where specific flaws in an application's stack are weak enough to allow an attacker to gain un-authorised access. Typically, in software development we leverage automated process that focus on scanning, reporting and remediating vulnerabilities. Impact pentesting takes this a step further and assesses how these weaknesses can be leveraged to further gain access to a system. This part of the Dojo we will be considering the two most used tools in an Attacker's arsenal: nmap and netcat.  
+
 
 ### nmap scanning
 
@@ -128,7 +145,6 @@ some flags, scripting engine and nmap book / manual
 introduce searchsploit and exploit db
 
 ### shells
-
 what is a shell
 
 #### bind shell
@@ -138,7 +154,7 @@ make a call to a server
 make a call to the attacker
 
 ### RCE on CDX machine
-php upload attack
+php attack
 
 ## Additional Network Katas
 
