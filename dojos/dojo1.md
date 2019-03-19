@@ -135,26 +135,129 @@ All going well you should have your very first network.
 
 ## 4. Attack the CDX System.
 
+> Prior to attacking the CDX box, you may want to make a snapshot or clone of the image. Otherwise any changes we make will persist over reboots.
+
 The purpose of a pentest is to try and see where specific flaws in an application's stack are weak enough to allow an attacker to gain un-authorised access. Typically, in software development we leverage automated process that focus on scanning, reporting and remediating vulnerabilities. Impact pentesting takes this a step further and assesses how these weaknesses can be leveraged to further gain access to a system. This part of the Dojo we will be considering the two most used tools in an Attacker's arsenal: nmap and netcat.  
 
 
 ### nmap scanning
 
-todo - what is nmap
-some flags, scripting engine and nmap book / manual
-introduce searchsploit and exploit db
+What is nmap? [Nmap](https://nmap.org/) is the foundation on which most networking asessments is built. Dubbed by many as the swiss army knife of pentesting tools it has a fantastic array of features we will use. At its heart nmap is a network mapper, it can be used to identify devices and services on your network and comes with a scripting engine that can be leveraged to test vulnerabilities.
+
+A simple direct scan against a specific ip can be run with the following syntax:
+`nmap <ip> -p <port>` __NOTE__ tha IP addresses may not be the same as in the documentation.
+
+Lets see what our Kali system is running with default ports:
+```
+nmap 127.0.0.1
+```
+With specified individual ports and port ranges:
+```
+nmap 127.0.0.1 -p 22,80,60-67,443
+```
+We aren't running any services, so all the ports are closed.
+
+Now try starting an apache webserver and run the previous command
+```
+service apache2 start
+nmap 127.0.0.1 -p 22,80,60-67,443
+```
+By default this has opened port 80 as you should see on your output.
+Stop the server
+```
+service apache2 stop
+```
+A useful technique when first landing on a network is to scan your surroundings. Running a full scan is costly and generates a lot of traffic, so lets perform a ping scan to reduce the noise. We can use either CIDR notation or IP Range notation.
+```
+nmap -sP 192.168.56.0/24
+```
+or
+```
+nmap -sP 192.168.56.1-254
+```
+This reduces the scope of our attack to far less IP addresses. Ordinarily we would run scans against single machines to reduce network traffic, but to show off syntax for multiple machines:
+
+```
+nmap 192.168.56.100,101,102,103
+```
+
+Take a momnet to try and work out what the results mean. One of the IPs is likley to be your Kali, another your host, a different one will be the Host-Only Gateway and one will be the CDX box.
+
+It is pretty hard to tell, try using the -O flag to get an estimate of the operating systems
+```
+nmap 192.168.56.100,101,102,103 -O
+```
+
+On my network the CDX box is 192.168.56.102, I've found a victim!
+
+From here I can probe the system with more specific requests to see how the system reacts. the -A flag is an enables and agrressive scan which provides a lot of indepth information, but has the downside of being really noisy. Additionally for stealth there are options around timing, packet types and using UDP or TCP scans. Experiment with these and the nmap manual to find out some of its capabilities.
+
+One last thing to show is the scripting engine. Kali comes with a pre-loaded 500+ nmap scripts stored in
+`/usr/share/nmap/scripts/` these can be leveraged via the --script= argument. Be careful using these as they can mess with the service and potentially bring it down, making it unusable as an attack vector later. 
+
+Lets run a ssh login brute force script in really verbose mode:
+
+```
+nmap 192.168.56.102 -p 22 --script ssh-brute.nse -vv
+```
+After a few moments the session will satrt and you will seee the various login attempts in the terminal.
+Once you are satisfied with what is going on, feel free to cancel the attack with `Ctl^ C` or wait until the end.
 
 ### shells
-what is a shell
+Todo - what is a shell
 
 #### bind shell
-make a call to a server
+Todo - make a call to a server
 
 #### reverse shell
-make a call to the attacker
+Todo - make a call to the attacker
 
 ### RCE on CDX machine
-php attack
+We've played with a couple of tools as an introduction, but lets actually attack the system.
+Based on a standard nmap scan I can see port 80 is open on the victim machine.
+
+```
+root@kali:~# nmap 192.168.56.102
+Starting Nmap 7.70 ( https://nmap.org ) at 2019-03-19 17:00 EDT
+Nmap scan report for 192.168.56.102
+Host is up (0.00012s latency).
+Not shown: 996 closed ports
+PORT    STATE SERVICE
+22/tcp  open  ssh
+80/tcp  open  http
+139/tcp open  netbios-ssn
+445/tcp open  microsoft-ds
+MAC Address: 08:00:27:5A:B8:41 (Oracle VirtualBox virtual NIC)
+
+Nmap done: 1 IP address (1 host up) scanned in 13.32 seconds
+```
+Port 80 by default serves up web content and by definition should be a good place to start looking for clues.
+
+You can curl the url to immediatley look at the code and look at injection points. Alternativley you can use tools like dirbuster to brute force a map of the site. To be honest I like to look at the website from the user perspective first to get a feel of the user experience of the site. Is there a login, a create a user or some public information I can gather from the site. Armed with this I can focus my attention on launching automated attacks later, once I've got an idea of what the user should be able to do.  
+
+Using the browser I go to http://192.168.56.102 and am presented with a login page. Nice, pin that as a place to try injection attacks and brute force later. Looking at the source code there are a few items I might want to try later, but before I do I want to see what happens if I break the system.
+
+I put a random aplpha string into the url to see what happens, and look it breaks the app. With debug mode? Oh wow.
+
+![http-scramble.png](images/dojo1/http-scramble.png)
+
+From this I can tell the serve is using Django and where the url patterns are.
+After trying a few I can see they are not protected by a login and I can easily access pages I shouldn't see.
+After putting a few in the base url I get to http://192.168.56.102/vote/
+
+todo - php upload
+todo - reverse shell
+todo - pwn root
+
+
+
+
+### Some undocumented things to Try
+
+* nmap doesn't scan all ports by default, see if you can workout how to find any hidden services
+* you can auto pwn a sevice with a vulnerability stored on kali. Can you find it with searchsploit?
+* You have access to port 22 and know the login details for the system. Can you re-create an ssh login using hydra?
+* Documentation is import, nmap has some flags that allow for static file outputs. see if you can find one you like that isn't an output re-direct.
 
 ## Additional Network Katas
 
