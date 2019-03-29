@@ -81,15 +81,13 @@ This will connect the Appliance to the default Host Only Network on your Host de
 * username: root
 * password: toor
 
-4. Check you have connection via NAT to the internet, by pinging Google and check out your network configuration with the following commands:
+4. Check you see if you can connect to the internet by pinging Google and check out your network configuration with the following commands:
 
 ```
 ping google.com -c 3 && ifconfig
 ```
 
-![ping-google.png](images/dojo1/ping-google.png)
-
-5. Take note of the IP address in eth0. In the image this is 10.0.2.15, yours may be different depending on your Host Adapter Settings.
+5. Take note of the IP address in eth0. It should be within the subnet specified on the host adapter.
 
 Now you have a full fledged Kali Linux Appliance that you can use for internal assessments.
 
